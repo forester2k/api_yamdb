@@ -1,63 +1,30 @@
-from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 
-User = get_user_model()
+from reviews.models import Category, Genre, Title
 
 
-class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all())],
-        required=True,
+class TitleSerializer(serializers.ModelSerializer):
+    genre = serializers.SlugRelatedField(
+        slug_field='slug', many=True, queryset=Genre.objects.all()
     )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
+    category = serializers.SlugRelatedField(
+        slug_field='slug', queryset=Category.objects.all()
     )
 
     class Meta:
+        model = Title
+        fields = '__all__'
+
+
+class ReadOnlyTitleSerializer(serializers.ModelSerializer):
+    rating = serializers.IntegerField(
+        source='reviews__score__avg', read_only=True
+    )
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
+
+    class Meta:
+        model = Title
         fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
+            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
         )
-        model = User
-
-
-class UserMeSerializer(serializers.ModelSerializer):
-    class Meta:
-        fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
-        )
-        model = User
-        read_only_fields = ("role",)
-
-
-class SignupDataSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-
-    def validate_username(self, value):
-        if value.lower() == "me":
-            raise serializers.ValidationError("Username 'me' is not valid")
-        return value
-
-    class Meta:
-        fields = ("username", "email")
-        model = User
-
-
-class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
