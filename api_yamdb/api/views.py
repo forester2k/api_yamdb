@@ -2,13 +2,13 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status, viewsets
+from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .permissions import IsAdmin, ReadOnly
+from .permissions import IsAdmin, IsAdminOrReadOnly, ReadOnly
 from .serializers import (SignupDataSerializer, TokenSerializer, UserMeSerializer, UserSerializer)
 from .serializers import CategorySerializer, GenreSerializer
 from reviews.models import Category, Genre
@@ -91,11 +91,38 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class ListCreateDestroyViewSet(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
+
+
+class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated|ReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
 
-class GenreViewSet(viewsets.ModelViewSet):
+    def destroy(self, request, *args, **kwargs):
+        category = get_object_or_404(Category, slug=kwargs['pk'])
+        category.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+
+    def destroy(self, request, *args, **kwargs):
+        genre = get_object_or_404(Genre, slug=kwargs['pk'])
+        genre.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
