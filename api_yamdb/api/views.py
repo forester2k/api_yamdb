@@ -7,15 +7,13 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+from reviews.models import Category, Genre, Review, Title
 
 from .permissions import IsAdmin, ReadOnly
+from .serializers import CategorySerializer, GenreSerializer, ReviewSerializer, TitleSerializer
 from .serializers import (SignupDataSerializer, TokenSerializer, UserMeSerializer, UserSerializer)
-from .serializers import CategorySerializer, GenreSerializer
-from reviews.models import Category, Genre
-
 
 User = get_user_model()
-
 
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
@@ -99,3 +97,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+
+
+class TitleViewSet(viewsets.ModelViewSet):
+    queryset = Title.objects.all()
+    serializer_class = TitleSerializer
+    permission_classes = [permissions.IsAuthenticated | ReadOnly]
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated | ReadOnly]

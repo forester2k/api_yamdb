@@ -1,4 +1,8 @@
+from django.contrib.auth import get_user_model
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -71,3 +75,24 @@ class GenreTitle(models.Model):
         constraints = [models.UniqueConstraint(
             fields=['title', 'genre'], name='unique_title_genre'
         ), ]
+
+
+class Review(models.Model):
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+        related_name='reviewer',
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        verbose_name='Произведение',
+    )
+    rate = models.PositiveSmallIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)]
+    )
+    text = models.TextField(
+        'Текст отзыва',
+        help_text='Введите текст комментария',
+    )
