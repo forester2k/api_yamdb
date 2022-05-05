@@ -15,6 +15,7 @@ from .serializers import (SignupDataSerializer, TokenSerializer, UserMeSerialize
 
 User = get_user_model()
 
+
 @api_view(["POST"])
 @permission_classes([permissions.AllowAny])
 def signup(request):
@@ -47,7 +48,7 @@ def get_jwt_token(request):
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data["confirmation_code"]
+            user, serializer.validated_data["confirmation_code"]
     ):
         token = AccessToken.for_user(user)
         return Response({"token": str(token)}, status=status.HTTP_200_OK)
@@ -92,7 +93,8 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated|ReadOnly]
+    permission_classes = [permissions.IsAuthenticated | ReadOnly]
+
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
@@ -103,6 +105,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
     permission_classes = [permissions.IsAuthenticated | ReadOnly]
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
