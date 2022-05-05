@@ -97,11 +97,12 @@ class ReadOnlyTitleSerializer(serializers.ModelSerializer):
         source='reviews__score__avg', read_only=True
     )
     genre = GenreSerializer(many=True)
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
 
     class Meta:
         model = Title
-        fields = (
-            'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
-        )
-        model = User
+        fields = '__all__'
+        # fields = (
+        #     'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
+        # )
+        model = Title  # User
