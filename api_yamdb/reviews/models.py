@@ -1,4 +1,8 @@
+from django.contrib.auth import get_user_model
 from django.db import models
+
+
+User = get_user_model()
 
 
 class Category(models.Model):
@@ -32,15 +36,13 @@ class Title(models.Model):
         verbose_name='Название',
         max_length=200
     )
-    genres = models.ManyToManyField(
-        Genre,
-        verbose_name='Жанр',
-        through='GenreTitle'
+    year = models.IntegerField(
+        verbose_name='Год',
     )
-    rating = models.IntegerField(
-        verbose_name='Рейтинг',
-        null=True,
-        default=None
+    genre = models.ManyToManyField(
+        Genre,
+        verbose_name='Жанры',
+        through='GenreTitle'
     )
     description = models.TextField(
         null=True,
@@ -73,3 +75,42 @@ class GenreTitle(models.Model):
         constraints = [models.UniqueConstraint(
             fields=['title', 'genre'], name='unique_title_genre'
         ), ]
+
+
+class Review(models.Model):
+    text = models.TextField(
+        verbose_name='Отзыв',
+        blank=True,
+        null=True,
+    )
+    score = models.IntegerField(
+        verbose_name='Оценка',
+        null=True,
+        default=None
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        blank=False,
+        null=False,
+        verbose_name='Произведение',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        blank=True,
+        null=True,
+        verbose_name='Автор отзыва',
+    )
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_author',
+            ),
+        ]
+
