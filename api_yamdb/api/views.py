@@ -4,36 +4,25 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
 
-from reviews.models import Category, Genre, Title, Review
-
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAuthorOrAdminOrModerator
-
-from .serializers import (
-    SignupDataSerializer,
-    TokenSerializer,
-    UserMeSerializer,
-    UserSerializer,
-    CategorySerializer,
-    GenreSerializer,
-    TitleSerializer,
-    ReadOnlyTitleSerializer,
-    ReviewSerializer,
-    CommentSerializer,
-)
-
+from .serializers import CategorySerializer, CommentSerializer
+from .serializers import GenreSerializer, UserMeSerializer, UserSerializer
+from .serializers import ReadOnlyTitleSerializer, ReviewSerializer
+from .serializers import SignupDataSerializer, TitleSerializer
+from .serializers import TokenSerializer
+from reviews.models import Category, Genre, Review, Title
 
 User = get_user_model()
 
 
-@api_view(["POST"])
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def signup(request):
     serializer = SignupDataSerializer(data=request.data)
@@ -41,12 +30,12 @@ def signup(request):
     serializer.save()
     user = get_object_or_404(
         User,
-        username=serializer.validated_data["username"]
+        username=serializer.validated_data['username']
     )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
-        subject="YaMDb registration",
-        message=f"Your confirmation code: {confirmation_code}",
+        subject='YaMDb registration',
+        message=f'Your confirmation code: {confirmation_code}',
         from_email=None,
         recipient_list=[user.email],
     )
@@ -54,27 +43,27 @@ def signup(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-@api_view(["POST"])
+@api_view(['POST'])
 @permission_classes([permissions.AllowAny])
 def get_jwt_token(request):
     serializer = TokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = get_object_or_404(
         User,
-        username=serializer.validated_data["username"]
+        username=serializer.validated_data['username']
     )
 
     if default_token_generator.check_token(
-        user, serializer.validated_data["confirmation_code"]
+        user, serializer.validated_data['confirmation_code']
     ):
         token = AccessToken.for_user(user)
-        return Response({"token": str(token)}, status=status.HTTP_200_OK)
+        return Response({'token': str(token)}, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    lookup_field = "username"
+    lookup_field = 'username'
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
@@ -82,20 +71,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(
         methods=[
-            "get",
-            "patch",
+            'get',
+            'patch',
         ],
         detail=False,
-        url_path="me",
+        url_path='me',
         permission_classes=[permissions.IsAuthenticated],
         serializer_class=UserMeSerializer,
     )
     def users_own_profile(self, request):
         user = request.user
-        if request.method == "GET":
+        if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        if request.method == "PATCH":
+        if request.method == 'PATCH':
             serializer = self.get_serializer(
                 user,
                 data=request.data,
@@ -130,7 +119,6 @@ class CategoryViewSet(ListCreateDestroyViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -147,8 +135,8 @@ class GenreViewSet(ListCreateDestroyViewSet):
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all().annotate(
-        Avg("reviews__score")
-    ).order_by("name")
+        Avg('reviews__score')
+    ).order_by('name')
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
@@ -158,7 +146,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_serializer_class(self):
-        if self.action in ("retrieve", "list"):
+        if self.action in ('retrieve', 'list'):
             return ReadOnlyTitleSerializer
         return TitleSerializer
 
@@ -188,4 +176,3 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
-

@@ -2,9 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-
-from reviews.models import Category, Genre, Title, Review, Comment
-
+from reviews.models import Category, Comment, Genre, Review, Title
 
 User = get_user_model()
 
@@ -20,12 +18,12 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
         )
         model = User
 
@@ -33,15 +31,15 @@ class UserSerializer(serializers.ModelSerializer):
 class UserMeSerializer(serializers.ModelSerializer):
     class Meta:
         fields = (
-            "username",
-            "email",
-            "first_name",
-            "last_name",
-            "bio",
-            "role",
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
         )
         model = User
-        read_only_fields = ("role",)
+        read_only_fields = ('role',)
 
 
 class SignupDataSerializer(serializers.ModelSerializer):
@@ -53,12 +51,12 @@ class SignupDataSerializer(serializers.ModelSerializer):
     )
 
     def validate_username(self, value):
-        if value.lower() == "me":
-            raise serializers.ValidationError("Username 'me' is not valid")
+        if value.lower() == 'me':
+            raise serializers.ValidationError('Username "me" is not valid')
         return value
 
     class Meta:
-        fields = ("username", "email")
+        fields = ('username', 'email')
         model = User
 
 
@@ -104,10 +102,7 @@ class ReadOnlyTitleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
-        # fields = (
-        #     'id', 'name', 'year', 'rating', 'description', 'genre', 'category'
-        # )
-        model = Title  # User
+        model = Title
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -148,4 +143,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
-
