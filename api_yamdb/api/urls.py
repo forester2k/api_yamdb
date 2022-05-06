@@ -6,6 +6,7 @@ from .views import (CategoryViewSet,
                     TitleViewSet,
                     ReviewViewSet,
                     CommentViewSet)
+
 from .views import UserViewSet, get_jwt_token, signup
 
 router = DefaultRouter()
@@ -23,6 +24,7 @@ router.register(
     CommentViewSet,
     basename='comment',
 )
+
 
 
 urlpatterns = [

@@ -2,7 +2,9 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
+
 from reviews.models import Category, Genre, Title, Review, Comment
+
 
 User = get_user_model()
 
@@ -146,3 +148,4 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
+

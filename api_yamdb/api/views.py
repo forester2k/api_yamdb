@@ -4,15 +4,18 @@ from django.core.mail import send_mail
 from django.db.models import Avg
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
+
 from rest_framework import filters, mixins, permissions, status, viewsets
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import AccessToken
+
 from reviews.models import Category, Genre, Title, Review
 
 from .filters import TitleFilter
 from .permissions import IsAdmin, IsAdminOrReadOnly, IsAuthorOrAdminOrModerator
+
 from .serializers import (
     SignupDataSerializer,
     TokenSerializer,
@@ -25,6 +28,7 @@ from .serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
+
 
 User = get_user_model()
 
@@ -126,6 +130,7 @@ class CategoryViewSet(ListCreateDestroyViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -183,3 +188,4 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
         serializer.save(author=self.request.user, review=review)
+

@@ -80,6 +80,7 @@ class GenreTitle(models.Model):
 class Review(models.Model):
     text = models.TextField(
         verbose_name='Отзыв',
+
     )
     score = models.IntegerField(
         verbose_name='Оценка',
@@ -125,3 +126,4 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
+
