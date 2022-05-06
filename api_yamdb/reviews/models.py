@@ -80,37 +80,50 @@ class GenreTitle(models.Model):
 class Review(models.Model):
     text = models.TextField(
         verbose_name='Отзыв',
-        blank=True,
-        null=True,
+
     )
     score = models.IntegerField(
         verbose_name='Оценка',
-        null=True,
-        default=None
     )
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
         related_name='reviews',
-        blank=False,
-        null=False,
         verbose_name='Произведение',
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='reviews',
-        blank=True,
-        null=True,
         verbose_name='Автор отзыва',
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['author', 'title'],
-                name='unique_author',
-            ),
-        ]
+        ordering = ('-pub_date',)
+
+
+class Comment(models.Model):
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Отзыв',
+    )
+    text = models.TextField('Комментарий')
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='comments',
+        verbose_name='Автор комментария',
+
+    )
+    pub_date = models.DateTimeField(
+        'Дата публикации',
+        auto_now_add=True,
+        db_index=True,
+    )
+
+    class Meta:
+        ordering = ('-pub_date',)
 
