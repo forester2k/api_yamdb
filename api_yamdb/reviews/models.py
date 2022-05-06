@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
 
-
 User = get_user_model()
 
 
@@ -101,6 +100,12 @@ class Review(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
+        constraints = [
+            models.UniqueConstraint(
+                fields=['author', 'title'],
+                name='unique_author',
+            ),
+        ]
 
 
 class Comment(models.Model):
@@ -126,4 +131,3 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ('-pub_date',)
-
