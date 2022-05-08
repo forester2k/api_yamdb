@@ -63,7 +63,6 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
         ordering = ['name']
 
-
     def __str__(self):
         return f'{self.name}'
 
