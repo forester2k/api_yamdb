@@ -102,35 +102,21 @@ class ListCreateDestroyViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    pass
+    permission_classes = [IsAdminOrReadOnly]
+    pagination_class = PageNumberPagination
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
 class CategoryViewSet(ListCreateDestroyViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsAdminOrReadOnly]
-    pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('name', )
-
-    def destroy(self, request, *args, **kwargs):
-        category = get_object_or_404(Category, slug=kwargs['pk'])
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GenreViewSet(ListCreateDestroyViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    pagination_class = PageNumberPagination
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('name', )
-
-    def destroy(self, request, *args, **kwargs):
-        genre = get_object_or_404(Genre, slug=kwargs['pk'])
-        genre.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TitleViewSet(viewsets.ModelViewSet):
@@ -178,5 +164,9 @@ class CommentViewSet(viewsets.ModelViewSet):
         return review.comments.all()
 
     def perform_create(self, serializer):
-        review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))
+        review = get_object_or_404(
+            Review,
+            pk=self.kwargs.get('review_id'),
+            title_id=self.kwargs.get('title_id'),
+        )
         serializer.save(author=self.request.user, review=review)
