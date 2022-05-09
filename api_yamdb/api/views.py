@@ -27,11 +27,20 @@ User = get_user_model()
 def signup(request):
     serializer = SignupDataSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    serializer.save()
-    user = get_object_or_404(
-        User,
-        username=serializer.validated_data['username']
+    user, created = User.objects.get_or_create(
+        email=serializer.validated_data["email"]
     )
+    if created and not User.objects.filter(
+        username=serializer.validated_data["username"]
+    ).count():
+        user.username = serializer.validated_data['username']
+        user.save()
+    else:
+        if user.username != serializer.validated_data['username']:
+            return Response(
+                None,
+                status=status.HTTP_400_BAD_REQUEST
+            )
     confirmation_code = default_token_generator.make_token(user)
     send_mail(
         subject='YaMDb registration',

@@ -1,3 +1,4 @@
+from re import M
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -10,6 +11,7 @@ class User(AbstractUser):
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
         unique=True,
+        max_length=254
     )
     username = models.CharField(
         verbose_name='Имя пользователя', max_length=150, null=True, unique=True
@@ -24,7 +26,17 @@ class User(AbstractUser):
         ],
         default=USER,
     )
-    bio = models.TextField(verbose_name='О себе', null=True, blank=True)
+    bio = models.TextField(verbose_name='О себе', blank=True)
+    first_name = models.CharField(
+        verbose_name='Имя',
+        max_length=30,
+        blank=True,
+    )
+    last_name = models.CharField(
+        verbose_name='Фамилия',
+        max_length=150,
+        blank=True,
+    )
 
     @property
     def is_moderator(self):
@@ -32,7 +44,7 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
-        return self.is_superuser or (self.role == self.ADMIN)
+        return self.is_superuser or self.is_staff or (self.role == self.ADMIN)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
