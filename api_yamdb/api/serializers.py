@@ -49,7 +49,7 @@ class SignupDataSerializer(serializers.ModelSerializer):
     def validate_username(self, value):
         if value == 'me':
             raise serializers.ValidationError(
-                'Использовать имя "me" в качестве имени пользователя запрещено.'
+                'Использовать имя "me" как имя пользователя запрещено.'
             )
         return value
 
