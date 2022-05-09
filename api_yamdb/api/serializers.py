@@ -43,16 +43,14 @@ class UserMeSerializer(serializers.ModelSerializer):
 
 
 class SignupDataSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
+    username = serializers.CharField()
+    email = serializers.EmailField()
 
     def validate_username(self, value):
-        if value.lower() == 'me':
-            raise serializers.ValidationError('Username "me" is not valid')
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Использовать имя "me" в качестве имени пользователя запрещено.'
+            )
         return value
 
     class Meta:
