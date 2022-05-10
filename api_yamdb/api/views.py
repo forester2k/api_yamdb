@@ -33,6 +33,7 @@ def signup(request):
         )
     except Exception:
         return Response(
+            {"Error": "Неверные данные в запросе"},
             status=status.HTTP_400_BAD_REQUEST
         )
     confirmation_code = default_token_generator.make_token(user)
@@ -42,7 +43,6 @@ def signup(request):
         from_email=None,
         recipient_list=[user.email],
     )
-
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -129,7 +129,6 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['name', 'year']
     filterset_class = TitleFilter
     filterset_fields = ['genre', 'category', 'name', 'year']
     pagination_class = PageNumberPagination
