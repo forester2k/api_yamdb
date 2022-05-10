@@ -42,9 +42,9 @@ class UserMeSerializer(serializers.ModelSerializer):
         read_only_fields = ('role',)
 
 
-class SignupDataSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
-    email = serializers.EmailField()
+class SignupDataSerializer(serializers.Serializer):
+    username = serializers.RegexField(regex=r'^[\w.@+-]+\Z',max_length=150)
+    email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
         if value == 'me':
@@ -53,13 +53,9 @@ class SignupDataSerializer(serializers.ModelSerializer):
             )
         return value
 
-    class Meta:
-        fields = ('username', 'email')
-        model = User
-
 
 class TokenSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField()
 
 
