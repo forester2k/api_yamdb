@@ -165,17 +165,17 @@ class CommentViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthorOrAdminOrModerator,)
 
     def get_queryset(self):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         review = get_object_or_404(
-            Review,
-            pk=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id'),
+            title.reviews,
+            pk=self.kwargs.get('review_id')
         )
         return review.comments.all()
 
     def perform_create(self, serializer):
+        title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
         review = get_object_or_404(
-            Review,
-            pk=self.kwargs.get('review_id'),
-            title_id=self.kwargs.get('title_id'),
+            title.reviews,
+            pk=self.kwargs.get('review_id')
         )
         serializer.save(author=self.request.user, review=review)
