@@ -17,7 +17,7 @@ from .serializers import GenreSerializer, UserMeSerializer, UserSerializer
 from .serializers import ReadOnlyTitleSerializer, ReviewSerializer
 from .serializers import SignupDataSerializer, TitleSerializer
 from .serializers import TokenSerializer
-from reviews.models import Category, Genre, Review, Title
+from reviews.models import Category, Genre, Title
 
 User = get_user_model()
 
@@ -31,7 +31,7 @@ def signup(request):
         user, created = User.objects.get_or_create(
             **serializer.validated_data
         )
-    except:
+    except Exception:
         return Response(
             status=status.HTTP_400_BAD_REQUEST
         )

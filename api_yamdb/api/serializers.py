@@ -43,7 +43,7 @@ class UserMeSerializer(serializers.ModelSerializer):
 
 
 class SignupDataSerializer(serializers.Serializer):
-    username = serializers.RegexField(regex=r'^[\w.@+-]+\Z',max_length=150)
+    username = serializers.RegexField(regex=r'^[\w.@+-]+\Z', max_length=150)
     email = serializers.EmailField(max_length=254)
 
     def validate_username(self, value):
