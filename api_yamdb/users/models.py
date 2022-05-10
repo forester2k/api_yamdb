@@ -6,6 +6,11 @@ class User(AbstractUser):
     ADMIN = 'admin'
     MODERATOR = 'moderator'
     USER = 'user'
+    ROLE_CHOICES = [
+        (ADMIN, 'Administrator'),
+        (MODERATOR, 'Moderator'),
+        (USER, 'User'),
+    ]
 
     email = models.EmailField(
         verbose_name='Адрес электронной почты',
@@ -17,12 +22,8 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=9,
-        choices=[
-            (ADMIN, 'Administrator'),
-            (MODERATOR, 'Moderator'),
-            (USER, 'User'),
-        ],
+        max_length=max(len(role) for role, _ in ROLE_CHOICES),
+        choices=ROLE_CHOICES,
         default=USER,
     )
     bio = models.TextField(verbose_name='О себе', blank=True)
