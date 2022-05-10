@@ -28,10 +28,10 @@ def signup(request):
     serializer = SignupDataSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user, created = User.objects.get_or_create(
-        email=serializer.validated_data["email"]
+        email=serializer.validated_data['email']
     )
     if created and not User.objects.filter(
-        username=serializer.validated_data["username"]
+        username=serializer.validated_data['username']
     ).count():
         user.username = serializer.validated_data['username']
         user.save()
