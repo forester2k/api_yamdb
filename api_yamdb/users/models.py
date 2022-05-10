@@ -17,7 +17,7 @@ class User(AbstractUser):
     )
     role = models.CharField(
         verbose_name='Роль',
-        max_length=50,
+        max_length=13,
         choices=[
             (ADMIN, 'Administrator'),
             (MODERATOR, 'Moderator'),
@@ -28,7 +28,7 @@ class User(AbstractUser):
     bio = models.TextField(verbose_name='О себе', blank=True)
     first_name = models.CharField(
         verbose_name='Имя',
-        max_length=30,
+        max_length=150,
         blank=True,
     )
     last_name = models.CharField(
